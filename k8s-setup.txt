@@ -1,0 +1,24 @@
+# First we're going to install kind as our kubernetes host environment:
+[ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.31.0/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+
+# Now we're going to ask kind to create a k8s cluster with the name k8s-playground.
+# The cluster will have a control-plane node and two worker nodes - one for frontend services and one for backend services.
+# The kind configuration for this setup is contained in the kind-config.yaml file
+kind create cluster --config ./kind-config.yaml
+
+# At this point, you should be able to run the following command and see three docker containers running the image kindest/node:v....:
+docker ps
+
+# You should also now be able to run the kubectl command (the k8s cli tool) and see some default k8s pods that are set up by kind automatically:
+kubectl get pods --all-namespaces
+
+# Now we're going to add prometheus to our k8s cluster - this enables tools to view the health and status of the k8s cluster
+helm install prometheus oci://ghcr.io/prometheus-community/charts/prometheus -f ./prometheus-helm-values.yaml
+
+# To interact with prometheus (if you're not going to buy Lens or some equivalent), we're going to install grafana:
+kubectl apply -f ./grafana-setup.yaml
+
+# We're then going to port-forward (associate a local port to a kubernetes cluster port) for now to enable browsing to the grafana endpoint from our browser:
+kubectl port-forward -n monitoring service/grafana 3000:3000
