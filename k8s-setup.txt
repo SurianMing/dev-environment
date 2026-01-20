@@ -15,10 +15,21 @@ docker ps
 kubectl get pods --all-namespaces
 
 # Now we're going to add prometheus to our k8s cluster - this enables tools to view the health and status of the k8s cluster
-helm install prometheus oci://ghcr.io/prometheus-community/charts/prometheus -f ./prometheus-helm-values.yaml
+helm install prometheus oci://ghcr.io/prometheus-community/charts/prometheus
 
 # To interact with prometheus (if you're not going to buy Lens or some equivalent), we're going to install grafana:
 kubectl apply -f ./grafana-setup.yaml
 
 # We're then going to port-forward (associate a local port to a kubernetes cluster port) for now to enable browsing to the grafana endpoint from our browser:
 kubectl port-forward -n monitoring service/grafana 3000:3000
+
+# The k8s dashboard id for grafana is 15661.
+
+# Now to install kafka
+kubectl apply -f kafka.yml
+
+# And the ui for kafka
+kubectl apply -f ui-kafka.yml
+
+# And we'll port-forward the kafka ui also.
+kubectl port-forward -n kafka service/kafka-ui 8080:8080

@@ -1,0 +1,9 @@
+openssl req -x509 -newkey ed25519 -days 3650 \
+ -noenc -keyout sming.com.key -out sming.com.crt -subj "/CN=sming.com" \
+ -addext "subjectAltName=DNS:sming.com,DNS:*.sming.com,IP:127.0.0.1"
+
+kubectl create secret tls sming-secret --key sming.com.key --cert sming.com.crt
+
+helm install nginx-ingress oci://ghcr.io/nginx/charts/nginx-ingress --version 2.4.1 --set nginx.service.type=NodePort
+export KUBE_EDITOR=nano
+kubectl edit svc nginx-ingress-controller

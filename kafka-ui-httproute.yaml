@@ -1,0 +1,32 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: kafka-ui
+spec:
+  parentRefs:
+  - name: sming
+  hostnames:
+  - "sming.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: kafka-ui
+      namespace: kafka
+      port: 8081
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: kafka-ui
+  namespace: kafka
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: default
+  to:
+  - group: ""
+    kind: Service

@@ -32,6 +32,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  labels:
+    app: kafka
   name: kafka-service
   namespace: kafka
 spec:
@@ -84,7 +86,13 @@ spec:
           - name: KAFKA_NODE_ID
             value: "1"
           - name: KAFKA_ADVERTISED_LISTENERS
-            value: "PLAINTEXT://localhost:9092"
+            value: "PLAINTEXT://kafka-0.kafka-service.kafka.svc.cluster.local:9092"
+          - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+            value: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
+          - name: KAFKA_INTER_BROKER_LISTENER_NAME
+            value: "PLAINTEXT"
+          - name: ALLOW_PLAINTEXT_LISTENER
+            value: "yes"
           - name: KAFKA_LOG_DIRS
             value: "/var/lib/kafka/data"
         resources: {}
