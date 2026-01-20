@@ -14,6 +14,11 @@ docker ps
 # You should also now be able to run the kubectl command (the k8s cli tool) and see some default k8s pods that are set up by kind automatically:
 kubectl get pods --all-namespaces
 
+# We'll install helm in order to help us get some third party tools added to our k8s cluster
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4
+chmod 700 get_helm.sh
+./get_helm.sh
+
 # Now we're going to add prometheus to our k8s cluster - this enables tools to view the health and status of the k8s cluster
 helm install prometheus oci://ghcr.io/prometheus-community/charts/prometheus
 
