@@ -37,4 +37,4 @@ kubectl apply -f kafka.yml
 kubectl apply -f ui-kafka.yml
 
 # And we'll port-forward the kafka ui also.
-kubectl port-forward -n kafka service/kafka-ui 8080:8080
+kubectl port-forward -n kafka service/kafka-ui 8081:8081
