@@ -1,0 +1,21 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  namespace: monitoring
+  name: grafana-ui
+spec:
+  parentRefs:
+  - name: gateway
+    namespace: default
+    sectionName: http
+  hostnames:
+  - "monitoring.sming.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: grafana
+      namespace: monitoring
+      port: 3000
