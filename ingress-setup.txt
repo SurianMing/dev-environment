@@ -1,9 +1,0 @@
-# extract go tar file and move to /usr/local ready for use:
-sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.25.6.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
-go version
-
-# Use go to install cloud-provider-kind - this will manage our ingress - some form of ingress controller will be required in any environment you use
-# This is the one we're using for our local environment.
-go install sigs.k8s.io/cloud-provider-kind@latest
-

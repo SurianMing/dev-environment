@@ -1,3 +1,14 @@
+# Install Docker, you can ignore the warning from Docker about using WSL
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+# Add your user to the Docker group
+sudo usermod -aG docker $USER
+
+# Sanity check that both tools were installed successfully
+docker --version
+docker compose version
+
 # First we're going to install kind as our kubernetes host environment:
 [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.31.0/kind-linux-amd64
 chmod +x ./kind
@@ -11,6 +22,17 @@ kind create cluster --config ./kind-config.yaml
 # At this point, you should be able to run the following command and see three docker containers running the image kindest/node:v....:
 docker ps
 
+# Now we're going to install kubectl - the command line tool for interacting with a k8s cluster
+# Download installer and checksum file.
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+
+# Run checksum comparison - you should get a message saying kubectl: OK. If not, wait a while and start this bit again - the file's not right.
+echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+
+# Run installer
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
 # You should also now be able to run the kubectl command (the k8s cli tool) and see some default k8s pods that are set up by kind automatically:
 kubectl get pods --all-namespaces
 
@@ -18,23 +40,3 @@ kubectl get pods --all-namespaces
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4
 chmod 700 get_helm.sh
 ./get_helm.sh
-
-# Now we're going to add prometheus to our k8s cluster - this enables tools to view the health and status of the k8s cluster
-helm install prometheus oci://ghcr.io/prometheus-community/charts/prometheus
-
-# To interact with prometheus (if you're not going to buy Lens or some equivalent), we're going to install grafana:
-kubectl apply -f ./grafana-setup.yaml
-
-# We're then going to port-forward (associate a local port to a kubernetes cluster port) for now to enable browsing to the grafana endpoint from our browser:
-kubectl port-forward -n monitoring service/grafana 3000:3000
-
-# The k8s dashboard id for grafana is 15661.
-
-# Now to install kafka
-kubectl apply -f kafka.yml
-
-# And the ui for kafka
-kubectl apply -f ui-kafka.yml
-
-# And we'll port-forward the kafka ui also.
-kubectl port-forward -n kafka service/kafka-ui 8081:8081
