@@ -4,4 +4,7 @@ helm install prometheus oci://ghcr.io/prometheus-community/charts/prometheus
 # To interact with prometheus (if you're not going to buy Lens or some equivalent), we're going to install grafana:
 kubectl apply -f ./grafana-setup.yaml
 
+# Now to set up the httproute which will allow nginx to route to this service
+kubectl apply -f ./httproute.yaml
+
 # The k8s dashboard id for grafana is 15661
