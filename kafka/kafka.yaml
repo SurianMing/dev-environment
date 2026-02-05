@@ -6,32 +6,6 @@ metadata:
     gateway-access: "true"
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  namespace: kafka
-  name: kafka-pv
-spec:
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /home/matt/data/kafka
-  persistentVolumeReclaimPolicy: Retain
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  namespace: kafka
-  name: kafka-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
----
-apiVersion: v1
 kind: Service
 metadata:
   labels:
@@ -67,6 +41,15 @@ spec:
       labels:
         app: kafka
     spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+      volumes:
+        - name: kafka-pv-storage
+          hostPath:
+            path: /home/matt/data/kafka
+            type: DirectoryOrCreate
       containers:
       - name: kafka
         imagePullPolicy: IfNotPresent
@@ -99,13 +82,9 @@ spec:
             value: "/var/lib/kafka/data"
         resources: {}
         volumeMounts:
-        - name: kafka-pv
+        - name: kafka-pv-storage
           mountPath: /var/lib/kafka/data
       # nodeSelector:
       #   tier: backend
       hostname: kafka
       restartPolicy: Always
-      volumes:
-        - name: kafka-pv
-          persistentVolumeClaim:
-            claimName: kafka-pvc

@@ -1,8 +1,15 @@
-# Now we're going to add prometheus to our k8s cluster - this enables tools to view the health and status of the k8s cluster.
-helm install prometheus oci://ghcr.io/prometheus-community/charts/prometheus
+# Set up the monitoring namespace and the grafana pvc
+kubectl apply -f namespace.yaml
 
-# To interact with prometheus (if you're not going to buy Lens or some equivalent), we're going to install grafana:
-kubectl apply -f ./grafana-setup.yaml
+# Now we're going to add prometheus to our k8s cluster - this enables tools to view the health and status of the k8s cluster.
+helm install prometheus oci://ghcr.io/prometheus-community/charts/prometheus -n monitoring
+
+# Add and update the grafana-community helm repo
+helm repo add grafana-community https://grafana-community.github.io/helm-charts
+helm repo update
+
+# Now install grafana using helm
+helm install grafana grafana-community/grafana -f grafana-config.yaml -n monitoring
 
 # Now to set up the httproute which will allow nginx to route to this service
 kubectl apply -f ./httproute.yaml
