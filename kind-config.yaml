@@ -9,6 +9,9 @@ nodes:
       protocol: TCP
     - containerPort: 30478
       hostPort: 8443
+  extraMounts:
+    - hostPath: /mnt/nfs
+      containerPath: /host-data
 # - role: worker
 #   labels:
 #     tier: frontend

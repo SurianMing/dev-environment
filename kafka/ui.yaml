@@ -4,12 +4,14 @@ metadata:
   namespace: kafka
   name: kafka-ui-pv
 spec:
+  storageClassName: kafka-ui-storage
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /home/matt/data/kui
+    path: /host-data/kafka-ui
+    type: DirectoryOrCreate
   persistentVolumeReclaimPolicy: Retain
 ---
 apiVersion: v1
@@ -18,11 +20,12 @@ metadata:
   namespace: kafka
   name: kafka-ui-pvc
 spec:
+  storageClassName: kafka-ui-storage
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 2Gi
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: data
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: data
+  name: sql-pv
+spec:
+  storageClassName: sql-storage
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /host-data/sql-server
+    type: DirectoryOrCreate
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: data
+  name: sql-pvc
+spec:
+  storageClassName: sql-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: data
+  name: mssql # name of the StatefulSet workload, the SQL Server instance name is derived from this. We suggest to keep this name same as the .spec.template.metadata.labels, .spec.selector.matchLabels and .spec.serviceName to avoid confusion.
+spec:
+  serviceName: "mssql" # serviceName is the name of the service that governs this StatefulSet. This service must exist before the StatefulSet, and is responsible for the network identity of the set.
+  replicas: 1 # only one pod, with one SQL Server instance deployed.
+  selector:
+    matchLabels:
+      app: mssql  # this has to be the same as .spec.template.metadata.labels
+  template:
+    metadata:
+      labels:
+        app: mssql # this has to be the same as .spec.selector.matchLabels. See <https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/>:
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+      containers:
+      - name: mssql # container name within the pod.
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+        - containerPort: 1433
+          name: tcpsql
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: MSSQL_ENABLE_HADR
+          value: "1"
+        - name: MSSQL_AGENT_ENABLED
+          value: "1"
+        - name: MSSQL_SA_PASSWORD
+          value: LetMeIn!2
+        volumeMounts:
+        - name: mssql
+          mountPath: "/var/opt/mssql"
+      volumes:
+        - name: mssql
+          persistentVolumeClaim:
+            claimName: sql-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: data
+  name: sql-server
+spec:
+  selector:
+    app: mssql
+  ports:
+  - port: 1433
+    targetPort: 1433
+    protocol: TCP

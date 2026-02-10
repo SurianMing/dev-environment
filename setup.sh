@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# remove kind cluster if exists for clean start
+kind delete cluster -n k8s-playground
+
 # kind initialisation
 kind create cluster --config kind-config.yaml
 

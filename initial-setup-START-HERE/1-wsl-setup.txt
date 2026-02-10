@@ -1,0 +1,19 @@
+# From an elevated powershell shell, run the following command:
+wsl --install Ubuntu-24.04
+
+# Once this has run, you're likely to need to restart your 'puter. You can now open the Ubuntu app to finish setup, which
+# will involve creating a username and password. If you're not used to linux, the password entry gives no indication of keys typed.
+
+# I would suggest using the Terminal application as your base shell for Linux.
+# When you open Terminal, you can click on the drop-down and select Settings (image1.png), then Add a new profile (image2.png),
+# then set up a profile similar to (image3.png). This can then be set as you default shell for Terminal as in (image4.png).
+
+# Now in you're linux shell script, create a directory for your git development repos:
+mkdir ~/development/git -p
+
+# In the command above, ~/ is the shortcut for your user directory, and will actually point to /home/{username}/. The -p indicates to create all
+# required folders.
+
+# We can then clone this repo into your linux file system by using the following commands:
+cd ~/development/git
+git clone https://github.com/SurianMing/dev-environment.git

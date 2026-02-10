@@ -1,0 +1,12 @@
+# From your linux shell, run the following command:
+sudo apt-get update && \
+  sudo apt-get install -y dotnet-sdk-10.0
+
+# Here sudo is the equivalent of using 'Run as administrator' in Windows, at least in experience if not technically.
+# The first command - apt-get update - gets the latest directory of available tools that can be installed using apt-get
+# The second command - apt-get install -y dotnet-sdk-10.0 - actually installs the dotnet sdk.
+
+# You can now download and install vs code. When you open it, you can click on the 'double-arrows' in the bottom left.
+# This will enable you to select your WSL/Ubuntu distro to work against from vs code (image5.png).
+# At this point, you're able to directly use you instance of vs code (running in friendly Windows) to work in linux.
+# Using the key combination Ctrl-' will open your terminal directly inside vs code. We're good to go!

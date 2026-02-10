@@ -9,15 +9,15 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   namespace: monitoring
-  name: grafana-storage-pv
+  name: grafana-pv
 spec:
   storageClassName: grafana-storage
   capacity:
-    storage: 10Gi
+    storage: 2Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /home/matt/data/grafana/storage
+    path: /host-data/grafana
     type: DirectoryOrCreate
   persistentVolumeReclaimPolicy: Retain
 ---
@@ -25,11 +25,11 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   namespace: monitoring
-  name: grafana-storage-pvc
+  name: grafana-pvc
 spec:
   storageClassName: grafana-storage
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
+      storage: 2Gi
