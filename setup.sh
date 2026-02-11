@@ -14,3 +14,5 @@ kind create cluster --config kind-config.yaml
 
 # kafka setup....
 ./setup-kafka.sh
+
+./setup-sql-server.sh

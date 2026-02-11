@@ -1,0 +1,29 @@
+# We're now going to mount a local linux drive using an dockerized nfs server
+# This will allow us to avoid an issue kind has when trying to mount a drive from wsl2
+# The mounted drive will be the location where k8s pods store their persistent data
+# so that it is not lost when k8s (or a specific pod) is restarted.
+
+# Firstly, we're going to create the local linux directory we wish to store our data in:
+mkdir ~/data
+
+# Now we'll run a docker container (separate to our k8s cluster - it's pretending to be a remote server)
+# This nfs server will share our local linux directory under it's pseudonym /nfs
+# As with a huge amount of modern development, this provides an abstraction layer between the consuming k8s cluster
+# and the real location we wish to use for storage - allowing operational changes to occur seamlessly:
+docker run -d --name nfs-server --restart unless-stopped --privileged \
+ -v ~/data:/nfs -e SHARED_DIRECTORY=/nfs \
+ -p 2049:2049 sharedvolume/nfs-server:latest
+
+# We now need to install an nfs client on to linux.
+# This will continue the pretence that ~/data is on a remote server
+# against which we are creating a mounted drive.
+
+# Create the drive mount that will be pointed at ~/data via nfs:
+sudo mkdir -p /mnt/nfs
+
+# Now install the nfs client:
+sudo apt update & \
+    sudo apt install nfs-common
+
+# Finally we're going to create the actual mount that will point /mnt/nfs to ~/data via the nfs server:
+sudo mount -t nfs4 127.0.0.1:/ /mnt/nfs
